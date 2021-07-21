@@ -7,6 +7,6 @@ I tried using compute shaders to calculate the transforms of the gameobjects, bu
 
 The custom editor is designed to have only the functionality my designers need for this particular project, hopefully it's not as scary for them to use.
 
-I also made the default settings fire-esque demonstrating much of the functionality.
+I also made the default settings fire-esque, demonstrating much of the functionality.
 
 Getting the preview to work was hard!
