@@ -5,10 +5,20 @@ public class DTGUIs
 {
     public void Slider(string label, ref Vector3 vector)
     {
-        Slider(label, ref vector, false);
+        Slider(new GUIContent(label), ref vector, false);
+    }
+
+    public void Slider(GUIContent label, ref Vector3 vector)
+    {
+        Slider(new GUIContent(label), ref vector, false);
     }
 
     public void Slider(string label, ref Vector3 vector, bool integer)
+    {
+        Slider(new GUIContent(label), ref vector, integer);
+    }
+
+    public void Slider(GUIContent label, ref Vector3 vector, bool integer)
     {
         string rounding = integer ? "F0" : "F2";
         GUILayout.BeginHorizontal();
@@ -20,10 +30,20 @@ public class DTGUIs
 
     public void MinMaxSlider(string label, ref Vector4 vector)
     {
-        MinMaxSlider(label,ref vector, false);
+        MinMaxSlider(new GUIContent(label), ref vector, false);
     }
 
-    public void MinMaxSlider(string label,ref Vector4 vector, bool integer)
+    public void MinMaxSlider(GUIContent label, ref Vector4 vector)
+    {
+        MinMaxSlider(label, ref vector, false);
+    }
+
+    public void MinMaxSlider(string label, ref Vector4 vector, bool integer)
+    {
+        MinMaxSlider(new GUIContent(label), ref vector, integer);
+    }
+
+    public void MinMaxSlider(GUIContent label, ref Vector4 vector, bool integer)
     {
         EditorGUI.BeginChangeCheck();
 
