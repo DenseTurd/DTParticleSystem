@@ -9,4 +9,4 @@ The custom editor is designed to have only the functionality my designers need f
 
 I also made the default settings fire-esque, demonstrating much of the functionality.
 
-Getting the preview to work was hard!
+Getting the preview to work was hard! So I've moved on and made it play mode only.
