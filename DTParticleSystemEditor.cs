@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine;
 
-[ExecuteAlways]
 #if UNITY_EDITOR
 [CustomEditor(typeof(DTParticleSystem))]
+[ExecuteAlways]
 public class DTParticleSystemEditor : Editor
 {
     DTGUIs guis = new DTGUIs();

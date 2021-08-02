@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[ExecuteAlways]
 public class ParticleController : MonoBehaviour
 {
     float initialScale;
@@ -22,9 +21,6 @@ public class ParticleController : MonoBehaviour
     public ParticleDatas particleDatas;
     bool initialized;
 
-    float deltaTime;
-    float lastFrameTime;
-
     public void Init(ParticleDatas PD)
     {
         particleDatas = PD;
@@ -39,7 +35,6 @@ public class ParticleController : MonoBehaviour
         drag = PD.Drag;
 
         initialized = true;
-        lastFrameTime = Time.realtimeSinceStartup;
     }
 
     void SetPosition(ParticleDatas PD)
@@ -109,9 +104,6 @@ public class ParticleController : MonoBehaviour
     {
         if (!initialized) return;
 
-        deltaTime = Application.isPlaying ? Time.deltaTime : Time.realtimeSinceStartup - lastFrameTime;
-        lastFrameTime = Time.realtimeSinceStartup;
-
         Move();
         Drag();
         Gravity();
@@ -121,20 +113,20 @@ public class ParticleController : MonoBehaviour
 
     void Move()
     {
-        transform.Translate(dir * speed * deltaTime, Space.World);
+        transform.Translate(dir * speed * Time.deltaTime, Space.World);
     }
 
     void Drag()
     {
-        speed -= speed * deltaTime * drag;
+        speed -= speed * Time.deltaTime * drag;
     }
 
     void Gravity()
     {
         if (particleDatas.Gravity)
         {
-            transform.Translate(gravity * deltaTime, Space.World);
-            gravity += initialGravity * deltaTime * 9.8f;
+            transform.Translate(gravity * Time.deltaTime, Space.World);
+            gravity += initialGravity * Time.deltaTime * 9.8f;
         }
     }
 
@@ -159,7 +151,7 @@ public class ParticleController : MonoBehaviour
 
     void LifeTime()
     {
-        currentLifeTime += deltaTime;
+        currentLifeTime += Time.deltaTime;
 
         if (currentLifeTime >= maxLifeTime)
         {
@@ -172,17 +164,4 @@ public class ParticleController : MonoBehaviour
     {
         dtps.pool.ReturnToPool(this);
     }
-
-#if UNITY_EDITOR
-    void OnDrawGizmos()
-    {
-        if (!Application.isPlaying)
-        {
-            if (initialized)
-            {
-                Update();
-            }
-        }
-    }
-#endif
 }

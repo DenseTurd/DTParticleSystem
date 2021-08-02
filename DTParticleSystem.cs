@@ -1,9 +1,5 @@
-﻿using UnityEditor.Experimental.SceneManagement;
-using UnityEditor.SceneManagement;
-using UnityEngine.SceneManagement;
-using UnityEngine;
+﻿using UnityEngine;
 
-[ExecuteAlways]
 [RequireComponent(typeof(ParticlePool))]
 public class DTParticleSystem : MonoBehaviour
 {
@@ -46,35 +42,14 @@ public class DTParticleSystem : MonoBehaviour
     float triggerTimer;
     [HideInInspector] public GenericObjectPool<Component> pool;
 
-    bool initialized;
-    float deltaTime;
-    float lastFrameTime;
-    bool queueSetup;
-
     public void Start()
     {
         if (!prefab) return;
 
-        HidePreviewObjects();
         SetParticleDatas();
         SetSpawnTime();
         SetupParticleController();
         SetupPool();
-
-        initialized = true;
-
-        lastFrameTime = Time.realtimeSinceStartup;
-    }
-
-    void OnEnable()
-    {
-        PrefabStage.prefabStageClosing += DestroyPreviewObjects;
-    }
-
-    void OnDisable()
-    {
-        PrefabStage.prefabStageClosing -= DestroyPreviewObjects;
-        DestroyPreviewObjects();
     }
 
     void SetupParticleController()
@@ -114,11 +89,6 @@ public class DTParticleSystem : MonoBehaviour
 
     public void Update()
     {
-        if (!initialized) return;
-
-        deltaTime = Application.isPlaying ? Time.deltaTime : Time.realtimeSinceStartup - lastFrameTime;
-        lastFrameTime = Time.realtimeSinceStartup;
-
         ActivationCheck();
         if (!active) return;
 
@@ -126,7 +96,7 @@ public class DTParticleSystem : MonoBehaviour
         {
             if (triggerTimer > 0)
             {
-                triggerTimer -= deltaTime;
+                triggerTimer -= Time.deltaTime;
                 SpawnTiming();
             }
         }
@@ -138,11 +108,11 @@ public class DTParticleSystem : MonoBehaviour
 
     void SpawnTiming()
     {
-        spawnTimer -= deltaTime;
+        spawnTimer -= Time.deltaTime;
 
         if (spawnTimer <= 0)
         {
-            int amountToSpawn = (int)(Mathf.Ceil(deltaTime / spawnTime));
+            int amountToSpawn = (int)(Mathf.Ceil(Time.deltaTime / spawnTime));
             spawnTimer = spawnTime;
             for (int i = 0; i < amountToSpawn; i++)
             {
@@ -153,7 +123,7 @@ public class DTParticleSystem : MonoBehaviour
 
     void ActivationCheck()
     {
-        activateCheckTimer -= deltaTime;
+        activateCheckTimer -= Time.deltaTime;
         if (activateCheckTimer <= 0)
         {
             activateCheckTimer = activateCheckTime;
@@ -171,6 +141,7 @@ public class DTParticleSystem : MonoBehaviour
     public void Spawn()
     {
         var particle = pool.Get();
+        if (particle == null) return;
 
         particle.transform.SetParent(transform, true);
 
@@ -205,80 +176,23 @@ public class DTParticleSystem : MonoBehaviour
         particleDatas.Pool = pool;
     }
 
-    public void OnValidate()
-    {
-        SetSpawnTime();
-        SetParticleDatas();
-
-        if (!initialized) queueSetup = true;
-    }
-
     void SetSpawnTime()
     {
         spawnTime = triggered ? duration.x / ((int)Rand.Range(triggeredAmount.x, triggeredAmount.y)) : 1 / frequency.x;
     }
 
-    void DestroyPreviewObjects(PrefabStage stage)
+    public void OnValidate()
     {
-        DestroyPreviewObjects();
-    }
-
-    void DestroyPreviewObjects()
-    {
-        for (int i = transform.childCount - 1; i > -1; i--)
-        {
-            if (transform.GetChild(i))
-            {
-                DestroyImmediate(transform.GetChild(i).gameObject);
-            }
-        }
-        pool.objects.Clear();
-        HidePreviewObjects();
-    }
-
-    void HidePreviewObjects()
-    {
-        for (int i = transform.childCount - 1; i > -1; i--)
-        {
-            Transform child = transform.GetChild(i);
-            if (child)
-            {
-                child.gameObject.SetActive(false);
-                child.GetComponent<ParticleController>().dtps = this; // Hacky bastard
-            }
-        }
-        initialized = false;
+        SetParticleDatas();
+        SetSpawnTime();
     }
 
 #if UNITY_EDITOR
-
     void OnDrawGizmosSelected()
     {
         Gizmos.DrawWireSphere(transform.position, area.x);
     }
-
-    void OnDrawGizmos()
-    {
-        if (!Application.isPlaying)
-        {
-            if (!initialized)
-            {
-                Start();
-            }
-            Update();
-        }
-    }
-
 #endif
-
-    void LateUpdate()
-    {
-        if (queueSetup)
-        {
-            Start();
-            queueSetup = false;
-        }    
-    }
 }
 
 public struct ParticleDatas
